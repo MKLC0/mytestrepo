@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/elementui.css"/>
+    <script src="js/vue.min.js"></script>
+    <script src="js/elementui.js"></script>
+    <script src="js/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-form :inline="true" :model="houseQO" class="demo-form-inline">
+        <el-form-item label="楼宇">
+            <el-select v-model="houseQO.buildingId" placeholder="请选择">
+                <el-option
+                    v-for="building in this.buildings"
+                    :key="building.buildingId"
+                    :label="building.buildingName+building.unity"
+                    :value="building.buildingId">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="房号">
+            <el-input v-model="houseQO.houseNo" placeholder="房号"></el-input>
+        </el-form-item>
+        <el-form-item label="面积选择">
+            <el-input v-model="houseQO.minArea" placeholder="最小面积"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-col class="line">-</el-col>
+        </el-form-item>
+        <el-form-item>
+            <el-input v-model="houseQO.maxArea" placeholder="最大面积"></el-input>
+        </el-form-item>
+
+
+        <el-form-item>
+            <el-button type="primary" @click="onSubmit">查询</el-button>
+        </el-form-item>
+    </el-form>
+    <el-table
+            :data="tableData"
+            style="width: 100%">
+        <el-table-column
+                label="房屋编号"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.houseId }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="房间号"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.houseNo }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="楼宇单元"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.building.buildingName+scope.row.building.unity }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="面积"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.area }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="备注"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.remark }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="业主"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.owner.ownerName }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="提交时间"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.submitTime }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="图片"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">
+                    <img style="height: 55px" :src="scope.row.photo">
+                </span>
+            </template>
+        </el-table-column>
+        <el-table-column label="操作">
+            <template slot-scope="scope">
+                <el-button
+                        size="mini"
+                        @click="handleEdit(scope.$index, scope.row)">编辑
+                </el-button>
+                <el-button
+                        size="mini"
+                        type="danger"
+                        @click="handleDelete(scope.$index, scope.row)">删除
+                </el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+    <div class="block">
+        <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="pageBean.currPage"
+                :page-sizes="[2, 4, 6, 8]"
+                :page-size="2"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="pageBean.totalNums">
+        </el-pagination>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            buildings: [],
+            tableData: [],
+            pageBean: {},
+            pageSize: 2,
+            page: 1,
+            houseQO: {
+                buildingId: null,
+                houseNo: null,
+                minArea: null,
+                maxArea: null
+            }
+        },
+        mounted: function () {
+            axios.post("/house/list", {
+                    houseQO: this.houseQO,
+                    pageSize: this.pageSize,
+                    page: this.page
+            }).then(r => {
+                if (r.data.code == 200) {
+                    this.pageBean = r.data.data
+                    this.tableData = r.data.data.data
+                } else {
+                }
+            }),
+            axios.get("/building/all").then(r => {
+                if (r.data.code == 200) {
+                    this.buildings = r.data.data
+                } else {
+                }
+            })
+        },
+        methods: {
+            onSubmit() {
+                console.log(this.houseQO)
+                axios.post("/house/list", {
+                        houseQO: this.houseQO,
+                        pageSize: this.pageSize,
+                        page: this.page
+                }).then(r => {
+                    if (r.data.code == 200) {
+                        this.pageBean = r.data.data
+                        this.tableData = r.data.data.data
+                    } else {
+
+                    }
+                })
+            },
+            handleSizeChange(val) {
+                this.pageSize = val
+                this.page = 1
+                axios.get("/house/list", {
+                    params: {
+                        pageSize: this.pageSize,
+                        page: this.page
+                    }
+                }).then(r => {
+                    if (r.data.code == 200) {
+                        this.pageBean = r.data.data
+                        this.tableData = r.data.data.data
+                    } else {
+
+                    }
+                })
+            },
+            handleCurrentChange(val) {
+                this.page = val
+                axios.get("/house/list", {
+                    params: {
+                        pageSize: this.pageSize,
+                        page: this.page
+                    }
+                }).then(r => {
+                    if (r.data.code == 200) {
+                        this.pageBean = r.data.data
+                        this.tableData = r.data.data.data
+                    } else {
+
+                    }
+                })
+            },
+            handleEdit(a, b) {
+                let id = b.buildingId;
+            }
+        }
+    })
+</script>
+</body>
+</html>

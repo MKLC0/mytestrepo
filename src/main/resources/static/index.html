@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>后台管理中心</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/pintuer1.2.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="js/vue.min.js"></script>
+    <script src="js/axios.min.js"></script>
+</head>
+
+<body style="background-color: #f2f9fd;">
+<div class="header bg-main">
+    <div class="logo margin-big-left fadein-top">
+        <h1>
+            蜗牛学苑后台管理系统
+        </h1>
+    </div>
+    <div class="head-l">
+        <a class="button button-little bg-green" href="" target="right"> <span
+                class="icon-home"></span>管理首页
+        </a> &nbsp;&nbsp; <a class="button button-little bg-red" href="">
+        <span class="icon-power-off"></span>退出登录
+    </a>
+        Welcome! XXX
+    </div>
+</div>
+<div class="leftnav" id="app">
+    <div class="leftnav-title">
+        <strong><span class="icon-list"></span>菜单列表</strong>
+    </div>
+    <div v-for="m in menu" v-if="m.parent==null">
+        <h2>
+            <span class="icon-user">{{m.menuName}}</span>
+        </h2>
+        <ul v-for="s in menu" v-if="s.parent==m.menuId">
+            <li>
+                <a :href="s.link" target="right">
+                    <span class="icon-caret-right">{{s.menuName}}</span></a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="admin">
+    <iframe src="welcome.html" name="right" width="100%" height="100%"></iframe>
+</div>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            menu: []
+        },
+        mounted: function () {
+            axios.post("/menu/left").then(r => {
+                this.menu = r.data.data
+            })
+        }
+    })
+</script>
+</body>
+
+</html>

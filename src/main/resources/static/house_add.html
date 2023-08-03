@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/elementui.css"/>
+    <script src="js/vue.min.js"></script>
+    <script src="js/elementui.js"></script>
+    <script src="js/axios.min.js"></script>
+</head>
+<body>
+
+<div id="app">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="房屋编号" prop="houseNo">
+            <el-input v-model="ruleForm.houseNo"></el-input>
+        </el-form-item>
+        <el-form-item label="楼宇名称" prop="buildingId">
+            <el-select v-model="ruleForm.building.buildingId" placeholder="请选择">
+                <el-option
+                        v-for="building in this.buildings"
+                        :key="building.buildingId"
+                        :label="building.buildingName+building.unity"
+                        :value="building.buildingId">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="面积" prop="area">
+            <el-input v-model="ruleForm.area"></el-input>
+        </el-form-item>
+        <el-form-item label="备注" prop="remark">
+            <el-input v-model="ruleForm.remark"></el-input>
+        </el-form-item>
+        <el-form-item label="业主" prop="ownerId">
+            <el-select v-model="ruleForm.owner.ownerId" placeholder="请选择">
+                <el-option
+                        v-for="owner in this.owners"
+                        :key="owner.ownerId"
+                        :label="owner.ownerName"
+                        :value="owner.ownerId">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="提交时间" prop="remark">
+            <el-date-picker
+                    v-model="ruleForm.submitTime"
+                    type="date"
+                    placeholder="选择日期">
+            </el-date-picker>
+        </el-form-item>
+        <el-form-item label="图片上传" prop="photo">
+            <el-upload
+                    action="/house/upload"
+                    list-type="picture-card"
+                    :on-preview="handlePictureCardPreview"
+                    :on-success="success"
+                    :on-remove="handleRemove">
+                <i class="el-icon-plus"></i>
+            </el-upload>
+            <el-dialog :visible.sync="dialogVisible">
+                <img width="100%" :src="dialogImageUrl" alt="">
+            </el-dialog>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="submitForm('ruleForm')">增加房屋</el-button>
+            <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+    </el-form>
+</div>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            buildings: [],
+            owners:[],
+            dialogImageUrl: '',
+            dialogVisible: false,
+            ruleForm: {
+                houseNo: null,
+                building: {
+                    buildingId: null,
+                },
+                area: null,
+                remark: null,
+                owner: {
+                    ownerId: null,
+                },
+                submitTime:null,
+                photo: null
+            },
+            rules: {
+                houseNo: [
+                    {required: true, message: '请输入房屋编号', trigger: 'blur'},
+                    {min: 3, max: 4, message: '长度在 3 到 4 个字符', trigger: 'blur'}
+                ],
+                buildingId: [
+                    {required: true, message: '请选择楼宇', trigger: 'blur'}
+                ],
+                area: [
+                    {required: true, message: '请输入面积', trigger: 'blur'},
+                    {min: 2, max: 7, message: '长度在 2 到 7 个字符', trigger: 'blur'}
+                ]
+            },
+        },
+        mounted: function () {
+            axios.get("/building/all").then(r => {
+                if (r.data.code == 200) {
+                    this.buildings = r.data.data
+                    console.log(this.buildings)
+                } else {
+                }
+            })
+            axios.get("/owner/all").then(r => {
+                if (r.data.code == 200) {
+                    this.owners = r.data.data
+                    console.log(this.owners)
+                } else {
+                }
+            })
+        },
+        methods: {
+            submitForm() {
+                console.log(this.form)
+                axios.post("/house/add", this.ruleForm).then(r => {
+                    if (r.data.code == true) {
+                        this.$notify({
+                            title: '成功',
+                            message: '这是一条成功的提示消息',
+                            type: 'success'
+                        });
+                    } else {
+                        this.$notify.error({
+                            title: '错误',
+                            message: '这是一条错误的提示消息'
+                        });
+                    }
+                })
+            },
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
+
+            },
+            success(response) {
+                this.ruleForm.photo=response.data;
+                console.log(this.ruleForm.photo)
+            }
+        }
+    });
+</script>
+</body>
+</html>

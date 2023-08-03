@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/elementui.css"/>
+    <script src="js/vue.min.js"></script>
+    <script src="js/elementui.js"></script>
+    <script src="js/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-form :inline="true" :model="parkingQO" class="demo-form-inline">
+        <el-form-item label="车位地址号">
+            <el-input v-model="parkingQO.parkingAddress" placeholder="房号"></el-input>
+        </el-form-item>
+        <el-form-item label="面积选择">
+            <el-input v-model="parkingQO.minArea" placeholder="最小面积"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-col class="line">-</el-col>
+        </el-form-item>
+        <el-form-item>
+            <el-input v-model="parkingQO.maxArea" placeholder="最大面积"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="onSubmit">查询</el-button>
+        </el-form-item>
+    </el-form>
+    <el-table
+            :data="tableData"
+            style="width: 100%">
+        <el-table-column
+                label="车位编号"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.parkingId }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="车位地址号"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.parkingAddress }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="车位面积"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.parkingArea }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="车位状态"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.parkingStatus }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column label="操作">
+            <template slot-scope="scope">
+                <el-button
+                        size="mini"
+                        @click="handleEdit(scope.$index, scope.row)">编辑
+                </el-button>
+                <el-button
+                        size="mini"
+                        type="danger"
+                        @click="handleDelete(scope.$index, scope.row)">删除
+                </el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+    <div class="block">
+        <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="pageBean.currPage"
+                :page-sizes="[2, 4, 6, 8]"
+                :page-size="2"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="pageBean.totalNums">
+        </el-pagination>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            tableData: [],
+            pageBean: {},
+
+            parkingQO: {
+                parkingAddress: null,
+                minArea: null,
+                maxArea: null,
+                pageSize: 2,
+                page: 1,
+            }
+        },
+        mounted: function () {
+            axios.post("/parking/list",this.parkingQO).then(r => {
+                if (r.data.code == 200) {
+                    this.pageBean = r.data.data
+                    this.tableData = r.data.data.data
+                } else {
+                }
+            })
+        },
+        methods: {
+            onSubmit() {
+                console.log(this.parkingQO)
+                axios.post("/parking/list",this.parkingQO).then(r => {
+                    if (r.data.code == 200) {
+                        this.pageBean = r.data.data
+                        this.tableData = r.data.data.data
+                    } else {
+
+                    }
+                })
+            },
+            handleSizeChange(val) {
+                this.parkingQO.pageSize = val
+                this.parkingQO.page = 1
+                axios.post("/parking/list",this.parkingQO).then(r => {
+                    if (r.data.code == 200) {
+                        this.pageBean = r.data.data
+                        this.tableData = r.data.data.data
+                    } else {
+
+                    }
+                })
+            },
+            handleCurrentChange(val) {
+                this.parkingQO.page = val
+                axios.post("/parking/list",this.parkingQO).then(r => {
+                    if (r.data.code == 200) {
+                        this.pageBean = r.data.data
+                        this.tableData = r.data.data.data
+                    } else {
+
+                    }
+                })
+            },
+            handleDelete(s,a){
+                axios.post("/parking/delete",a).then(r => {
+                    if (r.data.code == 200) {
+                        this.onSubmit();
+                    } else {
+
+                    }
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

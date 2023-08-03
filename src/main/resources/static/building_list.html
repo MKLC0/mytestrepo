@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/elementui.css"/>
+    <script src="js/vue.min.js"></script>
+    <script src="js/elementui.js"></script>
+    <script src="js/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-table
+            :data="tableData"
+            style="width: 100%">
+        <el-table-column
+                label="楼宇编号"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.buildingId }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="楼宇名称"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.buildingName }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="楼宇单元"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.unity }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="楼宇状态"
+                width="180">
+            <template slot-scope="scope">
+                <span style="margin-left: 10px">{{ scope.row.buildingStatus }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column label="操作">
+            <template slot-scope="scope">
+                <el-button
+                        size="mini"
+                        @click="handleEdit(scope.$index, scope.row)">编辑
+                </el-button>
+                <el-button
+                        size="mini"
+                        type="danger"
+                        @click="handleDelete(scope.$index, scope.row)">删除
+                </el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+    <div class="block">
+        <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="pageBean.currPage"
+                :page-sizes="[4, 6, 8, 10]"
+                :page-size="2"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="pageBean.totalNums">
+        </el-pagination>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            tableData: [],
+            pageBean: {},
+            pageSize: 4,
+            page: 1
+        },
+        mounted: function () {
+            axios.get("/building/list", {
+                params: {
+                    pageSize: this.pageSize,
+                    page: this.page
+                }
+            }).then(r => {
+                if (r.data.code == 200) {
+                    this.pageBean = r.data.data
+                    this.tableData = r.data.data.data
+                    console.log(this.tableData)
+                } else {
+                }
+            })
+        },
+        methods: {
+            handleSizeChange(val) {
+                this.pageSize = val
+                this.page = 1
+                axios.get("/building/list", {
+                    params: {
+                        pageSize: this.pageSize,
+                        page: this.page
+                    }
+                }).then(r => {
+                    if (r.data.code == 200) {
+                        this.pageBean = r.data.data
+                        this.tableData = r.data.data.data
+                        console.log(this.tableData)
+                    } else {
+
+                    }
+                })
+            },
+            handleCurrentChange(val) {
+                this.page = val
+                axios.get("/building/list", {
+                    params: {
+                        pageSize: this.pageSize,
+                        page: this.page
+                    }
+                }).then(r => {
+                    if (r.data.code == 200) {
+                        this.pageBean = r.data.data
+                        this.tableData = r.data.data.data
+                        console.log(this.tableData)
+                    } else {
+
+                    }
+                })
+            },
+            handleEdit(a,b){
+                let id = b.buildingId;
+            }
+        }
+    })
+</script>
+</body>
+</html>

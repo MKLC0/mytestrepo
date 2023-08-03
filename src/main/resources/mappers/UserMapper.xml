@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.woniu.wuywboot.mapper.UserMapper">
+
+
+    <insert id="add">
+        insert into user(account,
+        password,
+        role,
+        user_status,
+        ) values(#{account},#{password},#{role},#{userStatus})
+    </insert>
+
+    <update id="update">
+        update user
+        <set>
+            <if test="account!=null">
+                account=#{account}
+            </if>
+            <if test="password!=null">
+                password=#{password}
+            </if>
+            <if test="role!=null">
+                role=#{role}
+            </if>
+            <if test="userStatus!=null">
+                user_status=#{userStatus}
+            </if>
+        </set>
+        where user_id=#{userId}
+    </update>
+
+    <delete id="delete">
+        delete from user where user_id=#{userId}
+    </delete>
+    <select id="select" resultType="user">
+        select * from user
+    </select>
+    <select id="queryById" resultMap="userMap">
+        select
+        u.user_id,u.account,u.password,u.role,u.user_status,m.menu_id,m.menu_name,m.link,m.parent_id
+        from user u, middle mi,menu m
+        where u.user_id = mi.user_id
+        and mi.menu_id = m.menu_id
+        and u.user_id =#{userId}
+    </select>
+    <select id="queryByAccount" resultMap="userMap">
+        select
+        u.user_id,u.account,u.password,u.role,u.user_status,m.menu_id,m.menu_name,m.link,m.parent_id
+        from user u, middle mi,menu m
+        where u.user_id = mi.user_id
+        and mi.menu_id = m.menu_id
+        and u.account =#{account}
+    </select>
+    <resultMap id="userMap" type="user">
+        <id property="userId" column="user_id"/>
+        <result property="account" column="account"/>
+        <result property="password" column="password"/>
+        <result property="role" column="role"/>
+        <result property="userStatus" column="user_status"/>
+        <collection fetchType="lazy" property="menus" ofType="menu">
+            <id property="menuId" column="menu_id"/>
+            <result property="menuName" column="menu_name"/>
+            <result property="link" column="link"/>
+            <result property="parent" column="parent_id"/>
+        </collection>
+    </resultMap>
+</mapper>

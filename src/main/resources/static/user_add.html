@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/elementui.css"/>
+    <script src="js/vue.min.js"></script>
+    <script src="js/elementui.js"></script>
+    <script src="js/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="用户账号" prop="account">
+            <el-input v-model="ruleForm.account"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+            <el-input v-model="ruleForm.password"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-tree
+                    :data="data"
+                    show-checkbox
+                    node-key="id"
+                    :default-expanded-keys="[1, 2, 3]"
+                    :props="defaultProps">
+            </el-tree>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+            <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+
+    </el-form>
+
+</div>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            data: [],
+            defaultProps: {
+                children: 'subMenu',
+                label: 'menuName'
+            },
+            ruleForm: {
+                account: '',
+                password: ''
+            },
+            rules: {
+                account: [
+                    {required: true, message: '请输入楼宇名称', trigger: 'blur'},
+                    {min: 6, max: 12, message: '长度在 6 到 12 个字符', trigger: 'blur'}
+                ],
+                password: [
+                    {required: true, message: '请输入单元名称', trigger: 'blur'},
+                    {min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur'}
+                ]
+            },
+        },
+        mounted:function () {
+            axios.post("/menu/list").then(r=>{
+                this.data=r.data.data
+            })
+        },
+        methods: {
+            submitForm() {
+                console.log(this.form)
+                axios.post("/user/add").then(r => {
+                    if (r.data.data == true) {
+                        this.$notify({
+                            title: '成功',
+                            message: '这是一条成功的提示消息',
+                            type: 'success'
+                        });
+                    } else {
+                        this.$notify.error({
+                            title: '错误',
+                            message: '这是一条错误的提示消息'
+                        });
+                    }
+                })
+            }
+
+        }
+    })
+</script>
+</body>
+</html>

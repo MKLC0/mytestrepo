@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.woniu.wuywboot.mapper.BuildingMapper">   <!-- 命名空间，值与Mapper接口对应 -->
+    <insert id="add">    <!--id的值与接口中的方法名对应上-->
+        insert into building(building_name,unity,building_status) values(#{buildingName},#{unity},#{buildingStatus})
+    </insert>
+    <delete id="delete">
+        delete from building where building_id = #{buildingId}
+    </delete>
+    <update id="update">
+        update building
+        <set>
+            <if test="buildingName!=null" >
+                building_name=#{buildingName},
+            </if>
+            <if test="unity!=null">
+                unity=#{unity},
+            </if>
+            <if test="buildingStatus!=null">
+                building_status=#{buildingStatus},
+            </if>
+        </set>
+        where building_id = #{buildingId}
+    </update>
+
+    <select id="select" resultType="building">
+        select
+        building_id as buildingId,
+        building_name as buildingName,
+        unity as unity,
+        building_status as buildingStatus
+        from building
+        <where>
+            <if test="buildingId!=null">
+                building_id =#{buildingId}
+            </if>
+        </where>
+    </select>
+    <!--查询单个-->
+    <select id="queryById" resultType="building">
+        select
+        building_id, building_name, unity, building_status
+        from building
+        where building_id = #{buildingId}
+    </select>
+    <update id="updateStatus">
+        update building set building_status='1'
+        <where>
+         <foreach collection="ids" item="id" open="building_id in (" separator="," close=")">
+            #{id}
+        </foreach>
+        </where>
+    </update>
+
+    <select id="getCount" resultType="integer">
+        select count(*) from building;
+    </select>
+
+    <select id="selectByPage" resultType="building">
+        select * from building limit #{start},#{pageSize}
+    </select>
+</mapper>

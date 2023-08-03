@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woniu.wuywboot.mapper.HouseMapper">
+    <resultMap id="HouseMap" type="house">
+        <id property="houseId" column="house_id"/>
+        <result property="houseNo" column="house_no"/>
+        <result property="building.buildingId" column="building_id"/>
+        <result property="building.buildingName" column="building_name"/>
+        <result property="building.unity" column="unity"/>
+        <result property="building.buildingStatus" column="building_status"/>
+        <result property="area" column="area"/>
+        <result property="remark" column="remark"/>
+        <result property="owner.ownerId" column="owner_id"/>
+        <result property="owner.ownerName" column="owner_name"/>
+        <result property="owner.gender" column="gender"/>
+        <result property="owner.telnumber" column="telnumber"/>
+        <result property="owner.idCard" column="id_card"/>
+        <result property="owner.ownerStatus" column="owner_status"/>
+        <result property="submitTime" column="submit_time"/>
+        <result property="photo" column="photo"/>
+    </resultMap>
+    <select id="select" resultMap="HouseMap">
+        select h.*,b.building_name,b.unity,b.building_status,o.owner_name,o.gender,o.telnumber,o.id_card,o.owner_status
+        from house h,building b,owner o
+        where
+        h.building_id=b.building_id and o.owner_id=h.owner_id
+        <if test="buildingId!=null and buildingId!=0">
+            and h.building_id=#{buildingId}
+        </if>
+        <if test="houseNo!=null and houseNo!=0">
+            and h.house_no=#{houseNo}
+        </if>
+        <if test="minArea!=null">
+            <![CDATA[
+            and h.area >= #{minArea}
+            ]]>
+        </if>
+        <if test="maxArea!=null">
+            <![CDATA[
+            and h.area <= #{maxArea}
+            ]]>
+        </if>
+    </select>
+    <insert id="add">
+        insert into house
+        values(#{houseId},#{houseNo},#{building.buildingId},#{area},#{remark},#{owner.ownerId},#{submitTime},#{photo});
+    </insert>
+    <delete id="delete">
+        delete from house
+        <where>
+        <foreach collection="ids" item="id" open="house_id in(" separator="," close=")">
+            #{id}
+        </foreach>
+    </where>
+    </delete>
+    <select id="queryById" resultMap="HouseMap">
+        select h.*,b.building_name,b.unity,b.building_status,o.owner_name,o.gender,o.telnumber,o.id_card,o.owner_status
+        from house h,building b,owner o
+        where
+        h.building_id=b.building_id and o.owner_id=h.owner_id
+        and h.house_id=#{houseId}
+    </select>
+
+    <update id="updateHouse">
+        update house
+        <set>
+            <if test="houseNo != null and houseNo != ''">
+                house_no = #{houseNo},
+            </if>
+            <if test="building.buildingId != null">
+                building_id = #{building.buildingId},
+            </if>
+            <if test="area != null">
+                area = #{area},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="owner.ownerId != null">
+                owner_id = #{owner.ownerId},
+            </if>
+            <if test="submitTime != null">
+                submit_time = #{submitTime},
+            </if>
+            <if test="photo != null and photo != ''">
+                photo = #{photo},
+            </if>
+        </set>
+        where house_id = #{houseId}
+    </update>
+</mapper>

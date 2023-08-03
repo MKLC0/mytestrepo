@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.woniu.wuywboot.mapper.PaymentMapper">
+    <resultMap type="payment" id="PaymentMap">
+        <result property="paymentId" column="payment_id"/>
+        <result property="owner.ownerId" column="owner_id"/>
+        <result property="owner.ownerName" column="owner_name"/>
+        <result property="month" column="month"/>
+        <result property="money" column="money"/>
+        <result property="user.userId" column="operator_id"/>
+        <result property="user.account" column="account"/>
+        <result property="paymentTime" column="payment_time"/>
+    </resultMap>
+    <select id="select" resultMap="PaymentMap">
+        select * from payment,owner,user where payment.owner_id = owner.owner_id and user.user_id = payment.operator_id
+        <if test="ownerId!=null and ownerId!=0">
+            and payment.owner_id=#{ownerId}
+        </if>
+        <if test="month!=null and month!=''">
+            and month = #{month}
+        </if>
+        <if test="start!=null">
+            <![CDATA[
+            and payment_time >= #{start}
+            ]]>
+        </if>
+        <if test="end!=null">
+            <![CDATA[
+            and payment_time <= #{end}
+            ]]>
+        </if>
+    </select>
+    <insert id="add">
+        insert into payment(owner_id, month, money, operator_id, payment_time)
+        values (#{owner.ownerId}, #{month}, #{money}, #{user.userId}, now())
+    </insert>
+</mapper>

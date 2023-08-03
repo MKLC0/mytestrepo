@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.woniu.wuywboot.mapper.MenuMapper">
+    <select id="queryById" resultType="menu">
+        select
+        menu_id as menuId, menu_name as menuName, link, parent_id as parentId
+        from menu
+        where menu_id = #{menuId}
+    </select>
+    <select id="select" resultType="menu">
+        select
+        menu_id as menuId, menu_name as menuName, link, parent_id as parent
+        from menu
+    </select>
+</mapper>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/elementui.css"/>
+    <script src="js/vue.min.js"></script>
+    <script src="js/elementui.js"></script>
+    <script src="js/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="楼宇名称" prop="buildingName">
+            <el-input v-model="ruleForm.buildingName"></el-input>
+        </el-form-item>
+        <el-form-item label="楼宇单元" prop="unity">
+            <el-input v-model="ruleForm.unity"></el-input>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+            <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+    </el-form>
+
+</div>
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            ruleForm: {
+                buildingName: '',
+                unity: ''
+            },
+            rules: {
+                buildingName: [
+                    {required: true, message: '请输入楼宇名称', trigger: 'blur'},
+                    {min: 2, max: 4, message: '长度在 2 到 4 个字符', trigger: 'blur'}
+                ],
+                unity: [
+                    {required: true, message: '请输入单元名称', trigger: 'blur'},
+                    {min: 2, max: 4, message: '长度在 2 到 4 个字符', trigger: 'blur'}
+                ]
+            },
+        },
+        methods: {
+            submitForm() {
+                console.log(this.form)
+                axios.post("/building/add", this.form).then(r => {
+                    if (r.data.data == true) {
+                        this.$notify({
+                            title: '成功',
+                            message: '这是一条成功的提示消息',
+                            type: 'success'
+                        });
+                    } else {
+                        this.$notify.error({
+                            title: '错误',
+                            message: '这是一条错误的提示消息'
+                        });
+                    }
+                })
+            }
+
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.woniu.wuywboot.mapper.OwnerMapper">
+    <select id="queryById" resultType="owner">
+        select
+        owner_id, owner_name, gender, telnumber, id_card, owner_status
+        from owner
+        where owner_id = #{ownerId}
+    </select>
+    <select id="select" resultType="owner">
+        select owner_id ownerId,owner_name ownerName,gender,telnumber,id_card idCard,owner_status ownerStatus from owner
+    </select>
+    <insert id="insert">
+        insert into owner(owner_name, gender, telnumber, id_card, owner_status)
+        values (#{ownerName}, #{gender}, #{telnumber}, #{idCard}, #{ownerStatus})
+    </insert>
+    <update id="update">
+        <bind name="asd" value="'%'+asd+'%'"/>
+        update owner
+        <set>
+            <if test="ownerName != null and ownerName != ''">
+                owner_name = #{ownerName},
+            </if>
+            <if test="gender != null and gender != ''">
+                gender = #{gender},
+            </if>
+            <if test="telnumber != null and telnumber != ''">
+                telnumber = #{telnumber},
+            </if>
+            <if test="idCard != null and idCard != ''">
+                id_card = #{idCard},
+            </if>
+            <if test="ownerStatus != null and ownerStatus != ''">
+                owner_status = #{ownerStatus},concat('%',qwe,'%')
+            </if>
+        </set>
+        where owner_id = #{ownerId}
+    </update>
+    <delete id="delete">
+        delete from owner where owner_id = #{ownerId}
+    </delete>
+</mapper>

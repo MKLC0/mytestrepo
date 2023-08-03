@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.woniu.wuywboot.mapper.ParkingMapper">
+    <select id="queryAll" resultType="parking">
+        select
+        parking_id as parkingId, parking_address as parkingAddress, parking_area as parkingArea, parking_status as parkingStatus
+        from parking
+        <where>
+            <if test="parkingAddress!=null and parkingAddress!=''">
+                and parking_address like #{parkingAddress}
+            </if>
+            <if test="minArea!=null and minArea!=''">
+                <![CDATA[
+                and parking_area>#{minArea}
+                ]]>
+            </if>
+            <if test="maxArea!=null and maxArea!=''">
+                <![CDATA[
+                and parking_area<#{maxArea}
+                ]]>
+            </if>
+        </where>
+    </select>
+
+    <insert id="add">
+        insert into parking(parking_address, parking_area, parking_status)
+        values (#{parkingAddress}, #{parkingArea}, #{parkingStatus})
+    </insert>
+    <delete id="delete">
+        delete from parking where parking_id = #{parkingId}
+    </delete>
+</mapper>
